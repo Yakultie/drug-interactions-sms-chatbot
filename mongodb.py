@@ -4,7 +4,7 @@ from datetime import datetime
 
 mongo_client = pymongo.MongoClient(os.environ["MONGODB_CONNECTION_STRING"])
 mongo_db = mongo_client["medinfo"]
-mongo_collection = mongo_db["interactions"]
+mongo_collection = mongo_db["messages"]
 mongo_statuses = mongo_db["session_statuses"]
 
 def userInSession(userId):
@@ -42,11 +42,11 @@ def retrieveUserSessionTimestamp(userId):
     user_status = mongo_statuses.find_one({"userId": userId})
     return user_status["entered_session"]
 
-def retrieveUserInteractions(userId):
+def retrieveUserDocument(userId):
     return mongo_collection.find_one({"userId": userId})
 
-def recordUserInteraction(userId, role, message):
-    existing_document = retrieveUserInteractions(userId)
+def recordMessageExchange(userId, role, message):
+    existing_document = retrieveUserDocument(userId)
 
     record = {
                 "role": role,
@@ -66,7 +66,7 @@ def recordUserInteraction(userId, role, message):
         mongo_collection.insert_one(new_document)
     
 def retrieveUserMessages(userId):
-    existing_document = retrieveUserInteractions(userId)
+    existing_document = retrieveUserDocument(userId)
     messages = []
 
     for message in existing_document["history"]:
@@ -76,7 +76,7 @@ def retrieveUserMessages(userId):
     return messages
 
 def retrieveUserMessagesBeforeCurrentSession(userId):
-    existing_document = retrieveUserInteractions(userId)
+    existing_document = retrieveUserDocument(userId)
     timestamp = retrieveUserSessionTimestamp(userId)
     
     messages = []
@@ -88,7 +88,7 @@ def retrieveUserMessagesBeforeCurrentSession(userId):
     return messages
 
 def retrieveUserMessagesAfterTimestamp(userId, timestamp):
-    existing_document = retrieveUserInteractions(userId)
+    existing_document = retrieveUserDocument(userId)
     messages = []
 
     for message in existing_document["history"]:

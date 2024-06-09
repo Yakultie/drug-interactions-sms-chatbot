@@ -34,17 +34,16 @@ def getClarification(userId, question):
     print(messages)
     return messages[0]
 
-def deliverFinalAnswer(userId, answer):
+def deliverMessage(userId, content):
     try:
         message = client.messages \
             .create(
-                body = answer,
+                body = content,
                 from_ = chatbot_number,
                 to = userId
             )
         
-        mongodb.recordUserInteraction(userId, "agent", answer)
-        mongodb.recordEndSession(userId)
+        mongodb.recordMessageExchange(userId, "agent", content)
         return True
     except:
         return False

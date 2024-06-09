@@ -14,10 +14,10 @@ def incoming_sms():
 
     if not mongodb.userInSession(sender):
         mongodb.recordNewSession(sender)
-        mongodb.recordUserInteraction(sender, "user", question)
+        mongodb.recordMessageExchange(sender, "user", question)
         agent.entry_point(sender, question)
     else:
-        mongodb.recordUserInteraction(sender, "user", question)
+        mongodb.recordMessageExchange(sender, "user", question)
     
     return
 
